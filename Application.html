@@ -8,7 +8,7 @@
   <meta name="keywords" content="HTML CSS JS Dictionary" />
   <meta name="description" content="Simple English Dictionary using HTML CSS JS and Dictionary API." />
   <meta name="author" content="Soham Manjrekar" />
-  <title>Password Generator</title>
+  <title>Expense Tracker</title>
   <link rel="icon" type="image/x-icon" href="/images/logo.png">
   <link rel="stylesheet" type="text/css"
     href="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.1.3/assets/owl.carousel.min.css" />
@@ -73,47 +73,53 @@
         <div class="custom_heading-container">
           <hr>
           <h2>
-            Password Generator
+            Expense Tracker
           </h2>
 
         </div>
         <p>
-          A simple, secure & clean way to generate random passcodes and passwords 🔑
+          An expense tracker built using vanilla javascript to track your expenses dynamically.
         </p>
       </div>
     </div>
     <div class="container">
       <div class="service_container layout_padding2">
         <div class="container container1">
-          <div class="result-container">
-            <span id="result"></span>
-            <button class="btn" id="clipboard" style="width:10vw;">
-              Copy
-            </button>
-          </div>
-          <div class="settings">
-            <div class="setting">
-              <label for="length">Password Length</label>
-              <input type="number" name="length" id="length" min="4" max="20" value="20" />
-            </div>
-            <div class="setting">
-              <label for="uppercase">Include uppercase letters</label>
-              <input type="checkbox" name="uppercase" id="uppercase" checked />
-            </div>
-            <div class="setting">
-              <label for="lowercase">Include lowercase letters</label>
-              <input type="checkbox" name="lowercase" id="lowercase" checked />
-            </div>
-            <div class="setting">
-              <label for="numbers">Include numbers</label>
-              <input type="checkbox" name="numbers" id="numbers" checked />
-            </div>
-            <div class="setting">
-              <label for="symbols">Include symbols</label>
-              <input type="checkbox" name="symbols" id="symbols" checked />
+          <div class="header">
+            <img src="https://i.ibb.co/jfScDTC/budget.png" alt="Expense Tracker" />
+            <div class="balance-container">
+              <h2>Your Balance</h2>
+              <h2 id="balance" class="balance">₹0.00</h2>
             </div>
           </div>
-          <button class="btn btn-large" id="generate">Generate Password</button>
+          <div class="inc-exp-container">
+            <div>
+              <h4>Income</h4>
+              <p id="money-plus" class="money plus">+₹0.00</p>
+            </div>
+            <div>
+              <h4>Expenses</h4>
+              <p id="money-minus" class="money minus">-₹0.00</p>
+            </div>
+          </div>
+          <h3>History</h3>
+          <ul id="list" class="list"></ul>
+          <h3>Add new transaction</h3>
+          <form id="form" class="my-2">
+            <div class="form-control my-2" style="height:20vh !important;">
+              <label for="text">Description</label>
+              <input type="text" id="text" placeholder="Enter description..." />
+            </div>
+            <div class="form-control" style="height:20vh !important;">
+              <label for="amount">Amount <br />
+                <small>(-100 = expense, 100 = income)</small></label>
+              <input type="number" id="amount" placeholder="Enter amount..." />
+            </div>
+            <button class="btn">Add transaction</button>
+          </form>
+        </div>
+        <div class="notification-container" id="notification">
+          <p>Please add a description and amount</p>
         </div>
       </div>
   </section>

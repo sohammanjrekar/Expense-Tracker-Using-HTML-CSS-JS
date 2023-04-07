@@ -1,84 +1,106 @@
-const resultElement = document.getElementById("result");
-const lengthElement = document.getElementById("length");
-const uppercaseElement = document.getElementById("uppercase");
-const lowercaseElement = document.getElementById("lowercase");
-const numbersElement = document.getElementById("numbers");
-const symbolsElement = document.getElementById("symbols");
-const generateElement = document.getElementById("generate");
-const clipboardElement = document.getElementById("clipboard");
+const balance = document.getElementById('balance')
+const moneyPlus = document.getElementById('money-plus')
+const moneyMinus = document.getElementById('money-minus')
+const list = document.getElementById('list')
+const form = document.getElementById('form')
+const text = document.getElementById('text')
+const amount = document.getElementById('amount')
+const notification = document.getElementById('notification')
 
-// Random functions
-// fromCharCode: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/fromCharCode
-// ASCII codes: https://www.w3schools.com/charsets/ref_html_ascii.asp
-const getRandomLower = () =>
-  String.fromCharCode(Math.floor(Math.random() * 26) + 97);
+// const dummyTransactions = [
+//   { id: 1, text: "Flower", amount: -20 },
+//   { id: 2, text: "Salary", amount: 300 },
+//   { id: 3, text: "Book", amount: -10 },
+//   { id: 4, text: "Camera", amount: 150 },
+// ];
 
-const getRandomUpper = () =>
-  String.fromCharCode(Math.floor(Math.random() * 26) + 65);
+// let transactions = dummyTransactions;
 
-const getRandomNumber = () =>
-  String.fromCharCode(Math.floor(Math.random() * 10) + 48);
+const localStorageTransactions = JSON.parse(
+  localStorage.getItem('transactions'),
+)
+let transactions =
+  localStorageTransactions !== null ? localStorageTransactions : []
 
-const getRandomSymbol = () => {
-  const symbols = "!@#$%^&*(){}[]=<>/,.";
-  return symbols[Math.floor(Math.random() * symbols.length)];
-};
+function updateLocaleStorage() {
+  localStorage.setItem('transactions', JSON.stringify(transactions))
+}
 
-const randomFunctions = {
-  lower: getRandomLower,
-  upper: getRandomUpper,
-  number: getRandomSymbol,
-  symbol: getRandomSymbol,
-};
+function showNotification() {
+  notification.classList.add('show')
+  setTimeout(() => {
+    notification.classList.remove('show')
+  }, 2000)
+}
 
-const createNotification = (message) => {
-  const notif = document.createElement("div");
-  notif.classList.add("toast");
-  notif.innerText = message;
-  document.body.appendChild(notif);
-  setTimeout(() => notif.remove(), 3000);
-};
+function generateID() {
+  return Math.floor(Math.random() * 100000000)
+}
 
-clipboardElement.addEventListener("click", () => {
-  const password = resultElement.innerText;
-  if (!password) return;
-  const textarea = document.createElement("textarea");
-  textarea.value = password;
-  document.body.appendChild(textarea);
-  textarea.select();
-  document.execCommand("copy");
-  textarea.remove();
-  createNotification("Password copied to clipboard!");
-});
-
-generateElement.addEventListener("click", () => {
-  const length = +lengthElement.value;
-  const hasLower = lowercaseElement.checked;
-  const hasUpper = uppercaseElement.checked;
-  const hasNumber = numbersElement.checked;
-  const hasSymbol = symbolsElement.checked;
-  resultElement.innerText = generatePassword(
-    hasLower,
-    hasUpper,
-    hasNumber,
-    hasSymbol,
-    length
-  );
-});
-
-const generatePassword = (lower, upper, number, symbol, length) => {
-  let generatedPassword = "";
-  const typesCount = lower + upper + number + symbol;
-  const typesArr = [{ lower }, { upper }, { number }, { symbol }].filter(
-    (item) => Object.values(item)[0]
-  );
-  if (typesCount === 0) return "";
-  for (let i = 0; i < length; i += typesCount) {
-    typesArr.forEach((type) => {
-      const funcName = Object.keys(type)[0];
-      generatedPassword += randomFunctions[funcName]();
-    });
+function addTransaction(e) {
+  e.preventDefault()
+  if (text.value.trim() === '' || amount.value.trim() === '') {
+    showNotification()
+  } else {
+    const transaction = {
+      id: generateID(),
+      text: text.value,
+      amount: +amount.value,
+    }
+    transactions.push(transaction)
+    addTransactionDOM(transaction)
+    updateValues()
+    updateLocaleStorage()
+    text.value = ''
+    amount.value = ''
   }
-  const finalPassword = generatedPassword.slice(0, length);
-  return finalPassword;
-};
+}
+
+function addTransactionDOM(transaction) {
+  const sign = transaction.amount < 0 ? '-' : '+'
+  const item = document.createElement('li')
+  item.classList.add(sign === '+' ? 'plus' : 'minus')
+  item.innerHTML = `
+          ${transaction.text} <span>${sign}${Math.abs(transaction.amount)}</span
+          ><button class="delete-btn" onclick="removeTransaction(${
+            transaction.id
+          })"><i class="fa fa-times"></i></button>
+    `
+  list.appendChild(item)
+}
+
+function updateValues() {
+  const amounts = transactions.map((transaction) => transaction.amount)
+  const total = amounts
+    .reduce((accumulator, value) => (accumulator += value), 0)
+    .toFixed(2)
+  const income = amounts
+    .filter((value) => value > 0)
+    .reduce((accumulator, value) => (accumulator += value), 0)
+    .toFixed(2)
+  const expense = (
+    amounts
+      .filter((value) => value < 0)
+      .reduce((accumulator, value) => (accumulator += value), 0) * -1
+  ).toFixed(2)
+  balance.innerText = `₹${total}`
+  moneyPlus.innerText = `₹${income}`
+  moneyMinus.innerText = `₹${expense}`
+}
+
+function removeTransaction(id) {
+  transactions = transactions.filter((transaction) => transaction.id !== id)
+  updateLocaleStorage()
+  init()
+}
+
+// Init
+function init() {
+  list.innerHTML = ''
+  transactions.forEach(addTransactionDOM)
+  updateValues()
+}
+
+init()
+
+form.addEventListener('submit', addTransaction)
